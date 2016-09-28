@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>.obj Loader</title>
+<script type="text/javascript" src="./threejs/three.min.js"></script>
+<script type="text/javascript" src="./threejs/loaders/OBJLoader.js"></script>
+</head>
+<body>
+
+<div id="obj-viewer"></div>
+
+<script type="text/javascript">
+  function init() {
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+    camera.position.x = 130;
+    camera.position.y = 400;
+    camera.position.z = 50;
+    camera.lookAt(scene.position);
+    scene.add(camera);
+
+    var pointLight = new THREE.PointLight(0xFFFFFF);
+    pointLight.position.set(200, 200, 200);
+    scene.add(pointLight);
+
+    var renderer = new THREE.WebGLRenderer();
+    renderer.setClearColor("#4682B4");
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    document.getElementById("obj-viewer").appendChild(renderer.domElement);
+
+    var loader = new THREE.OBJLoader();
+    var mesh;
+
+    loader.load("./batman.obj", function(loadedMesh){
+      var material = new THREE.MeshLambertMaterial({color: 0x6887C6});
+      loadedMesh.children.forEach(function(child){
+        child.material = material;
+        child.geometry.computeFaceNormals();
+        child.geometry.computeVertexNormals();
+      });
+
+      mesh = loadedMesh;
+      loadedMesh.scale.set(10, 10, 10);
+      loadedMesh.rotation.x = -0.3;
+      scene.add(loadedMesh);
+    });
+
+    render();
+
+
+    function render() {
+      if (mesh) {
+          mesh.rotation.y += 0.001;
+          mesh.rotation.x += 0.001;
+      }
+
+      requestAnimationFrame(render);
+      renderer.render(scene, camera);
+    }
+  }
+  window.onload = init
+</script>
+</body>
+</html>
